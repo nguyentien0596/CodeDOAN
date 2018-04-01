@@ -22,6 +22,9 @@
 #include "tm_stm32_mpu6050_dmp.h"
 #include "tm_stm32_mpu6050_dmp_6axis_MotionApps20.h"
 #include "tm_stm32_usart.h"
+#include "Mpu6050_dmp_analysis.h"
+
+
 /* FATFS */
 FATFS FS;
 FIL fil;
@@ -36,8 +39,32 @@ char filename[30];
 uint8_t filenumber=0;
 /* END FATFS */
 
+/* analysis data */
+#define 		Yaw_Max   			65.0
+#define 		Pitch_Max 	65.0
+#define 		Roll_Max  	65.0
+
+#define  Accelerometer_X_MIN 3000
+#define  Accelerometer_Y_MIN 3000
+#define  Accelerometer_Z_MIN 16000
+
+double accelerationX = 0;
+double accelerationY = 0;
+double accelerationZ = 0;
+
+volatile double Gyroscope_x = 0;
+volatile double Gyroscope_y = 0;
+volatile double Gyroscope_z = 0;
+
+float Yaw_offset;
+float Pitch_offset;
+float Roll_offset;
 
 
+uint8_t thongbao=0;
+double acc=0;
+
+/* end analysis data */
 
 /* MPU6050 working structure */
 TM_MPU6050_t MPU6050;
@@ -130,7 +157,7 @@ int main(void) {
 	TM_DISCO_ButtonInit();
 	//---------------
 	TM_I2C_Init(MPU6050_I2C, MPU6050_I2C_PINSPACK, MPU6050_I2C_CLOCK);
-	TM_MPU6050_Init(&MPU6050, TM_MPU6050_Device_0, TM_MPU6050_Accelerometer_8G, TM_MPU6050_Gyroscope_250s);
+	TM_MPU6050_Init(&MPU6050, TM_MPU6050_Device_0, TM_MPU6050_Accelerometer_2G, TM_MPU6050_Gyroscope_250s);
 	
 	MPU6050address(0xD0);
 	MPU6050_initialize();
@@ -160,6 +187,16 @@ int main(void) {
 		}
 	}
 	/*END FATFS*/
+	/* analysis data */
+	
+	
+Yaw_offset   =-90.0;
+Pitch_offset =90.0;
+Roll_offset  =0.0;
+
+/* end analysis data */
+	
+	
 	while(1)
 	{
 		while (!mpuInterrupt && fifoCount < packetSize) ;
@@ -179,17 +216,50 @@ int main(void) {
         // track FIFO count here in case there is > 1 packet available
         // (this lets us immediately read more without waiting for an interrupt)
         fifoCount -= packetSize;
-				
+				accelerationX = (double)MPU6050.Accelerometer_X/ 16384;
+				accelerationY = (double)MPU6050.Accelerometer_Y/ 16384;
+				accelerationZ = (double)MPU6050.Accelerometer_Z/ 16384;
+				Gyroscope_x = (double)(MPU6050.Gyroscope_X+8) / 131;
+				Gyroscope_y = (double)(MPU6050.Gyroscope_Y-2) / 131;
+				Gyroscope_z	=	(double)(MPU6050.Gyroscope_Z+18) / 131;
 				MPU6050_dmpGetQuaternion(&q, fifoBuffer);
         MPU6050_dmpGetGravity(&gravity, &q);
         MPU6050_dmpGetYawPitchRoll(ypr, &q, &gravity);
 				Yaw=ypr[0]*180/3.14;
 				Pitch=ypr[1]*180/3.14;
-				Roll=ypr[2]*180/3.14;
+				Roll=ypr[2]*180/3.14;			
+/* analysis data */
+				// check nga
+				acc=sqrt(accelerationX*accelerationX+accelerationY*accelerationY+accelerationZ*accelerationZ);
+			  if(Yaw-Yaw_offset <Yaw_Max){  // check goc Yaw
+					//if(acc>16000)
+				} else if (Pitch-Pitch_offset <Pitch_Max){
+					
+				} else if (Roll-Roll_offset <Roll_Max){
+					if(MPU6050.Accelerometer_X>Accelerometer_X_MIN||-MPU6050.Accelerometer_X>Accelerometer_X_MIN){
+					 // thong bao 
+							thongbao++;
+					}
+					if(MPU6050.Accelerometer_Y>Accelerometer_Y_MIN||-MPU6050.Accelerometer_Y>Accelerometer_Y_MIN){
+					 // thong bao 
+							thongbao++;
+					}
+					if(MPU6050.Accelerometer_X>Accelerometer_Z_MIN||-MPU6050.Accelerometer_Z>Accelerometer_Z_MIN){
+					 // thong bao 
+							thongbao++;
+					}
+				}
+				
+
+
+
+
+/* end analysis data */
+				
 				k++;
 				if(k==10)
 					{k=0;
-					sprintf((char*)buff_char,"%0.5f\t%0.5f\t%0.5f\t%d\t%d\t%d\t%d\t%d\t%d\r\n",Yaw,Pitch,Roll,MPU6050.Accelerometer_X,MPU6050.Accelerometer_Y,MPU6050.Accelerometer_Z,MPU6050.Gyroscope_X,MPU6050.Gyroscope_Y,MPU6050.Gyroscope_Z);
+					sprintf((char*)buff_char,"%0.5f\t%0.5f\t%0.5f\t%0.5f\t%0.5f\t%0.5f\t%0.5f\t%0.5f\t%0.5f\t%0.5f\r\n",Yaw,Pitch,Roll,accelerationX,accelerationY,accelerationZ,acc,Gyroscope_x,Gyroscope_y,Gyroscope_z);
 					TM_USART_Puts(USART1,(char*)buff_char);
 						if(write==1)
 						{

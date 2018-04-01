@@ -599,6 +599,11 @@
               <FileType>1</FileType>
               <FilePath>..\00-STM32_LIBRARIES\tm_stm32_dma.c</FilePath>
             </File>
+            <File>
+              <FileName>Mpu6050_dmp_analysis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\00-STM32_LIBRARIES\Mpu6050_dmp_analysis.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
