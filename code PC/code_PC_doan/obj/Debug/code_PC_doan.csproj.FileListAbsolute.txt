@@ -1,0 +1,12 @@
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\bin\Debug\code_PC_doan.exe.config
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\obj\Debug\code_PC_doan.Properties.Resources.resources
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\obj\Debug\code_PC_doan.csproj.GenerateResource.Cache
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\bin\Debug\code_PC_doan.exe
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\bin\Debug\code_PC_doan.pdb
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\bin\Debug\MySql.Data.dll
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\bin\Debug\MySql.Data.xml
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\obj\Debug\code_PC_doan.csprojResolveAssemblyReference.cache
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\obj\Debug\code_PC_doan.exe
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\obj\Debug\code_PC_doan.pdb
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\obj\Debug\code_PC_doan.main.resources
+E:\DOAN\MyDoAn\laptrinh\code PC\code_PC_doan\code_PC_doan\obj\Debug\code_PC_doan.Dangnhapdatabase.resources

@@ -17,7 +17,12 @@ namespace SP_Ketnoi
         private string _database = "nurs_home";
         private string _user = "root";
         private string _password = "toor";
-        //public static String strconnection = "Server='"_"';Database=nurs_home;Port=3306;User ID=root;Password=toor";
+        public static String _strconnection = "Server='192.168.10.117';Database=nurs_home;Port=3306;User ID=root;Password=toor";
+        public string strconnection
+        {
+            get { return _strconnection; }
+            set { _strconnection = value; }
+        }
         public string ip_host
         {
             get { return _ip_host; }
@@ -42,7 +47,7 @@ namespace SP_Ketnoi
         MySqlCommand command;
         public void OpenConnection()
         {
-            conecttion = new MySqlConnection("Server='"+ip_host+"';Database="+_database+";Port=3306;User ID="+_user+";Password="+_password+"");
+            conecttion = new MySqlConnection(_strconnection);
             conecttion.Open();
         }
         public void CloseConnection()
@@ -85,88 +90,82 @@ namespace SP_Ketnoi
             CloseConnection();
             return dataReader;
         }
-
-
-        public string GetLoginLever(string Tennguoidung, string Matkhau) // lấy thông số đăng nhập , trả về admin , user , lỗi mật khẩu  errorPass, lỗi kết nối errorconection
-        {
-            string Return = "errorconection";
-            OpenConnection();
-            string strQuery = "SELECT * FROM mydb.tai_khoan where Ten_Nguoi_Dung='" + Tennguoidung + "' and Mat_Khau ='" + Matkhau + "' ";
-            command = conecttion.CreateCommand();
-            command.CommandType = System.Data.CommandType.Text;
-            command.CommandText = strQuery;
-            MySqlDataReader dataReader = command.ExecuteReader();
-            if (dataReader.Read())
-            {
-                Return = dataReader["Ma_Vai_Tro"].ToString();
-            }
-            else
-            {
-                Return = "errorPass";
-            }
-            conecttion.Close();
-            conecttion.Dispose();
-            return Return;
-        }
-        public DataTable GetTaiKhoan() // lấy tất cả Tài khoản
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT * FROM `mydb`.`tai_khoan`");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
-        public bool GetTaiKhoan_TenTruyNhap(string TenTruyNhap) // lấy tất cả Tài khoản
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT * FROM mydb.tai_khoan where Ten_Nguoi_Dung='" + TenTruyNhap + "'");
-            dataadapter.Fill(datareturn);
-            if (datareturn.Rows.Count == 0)
-            {
-                return true;
-            }
-            return false;
-        }
-        public void InsertTaiKhoan(string TenTruyNhap, string MatKhau, string MaVaiTro)
-        {
-            ExecuteNonQuery("INSERT INTO `mydb`.`tai_khoan` ( `Ten_Nguoi_Dung`, `Mat_Khau`, `Ma_Vai_Tro`) VALUES ('" + TenTruyNhap + "', '" + MatKhau + "', '" + MaVaiTro + "')");
-        }
-        public void UpdateTaiKhoan(string TenTruyNhap, string TenTruyNhap_new, string MatKhau, string MaVaiTro)
-        {
-            ExecuteNonQuery("UPDATE `mydb`.`tai_khoan` SET `Ten_Nguoi_Dung`='" + TenTruyNhap_new + "', `Mat_Khau`='" + MatKhau + "', `Ma_Vai_Tro`='" + MaVaiTro + "' WHERE `Ten_Nguoi_Dung`='" + TenTruyNhap + "'");
-        }
-        public void DelTaiKhoan(string TenTruyNhap)
-        {
-            ExecuteNonQuery("DELETE FROM `mydb`.`tai_khoan` WHERE `Ten_Nguoi_Dung`='" + TenTruyNhap + "'");
-        }
-        public DataTable GetNameGiangDuong() // dùng để lấy giá trị tên giảng đường
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT Ma_Phong_Hoc FROM mydb.phonghoc_slave");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
-        public DataTable GetDataGiangDuong(string nameGiangDuong, string nunberSelection)  // lấy ra số lượng nunberSelection bản ghi của bản ghi giảng đường nameGiangDuong
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT *FROM `ban_ghi_phong_hoc` where Ma_Phong_Hoc='" + nameGiangDuong + "' ORDER BY Stt DESC LIMIT " + nunberSelection + "");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
-
-        public DataTable GetNameMaChucVu() // dùng để lấy giá trị tên giảng đường
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT DISTINCT Ma_Lop_Chuc_Vu FROM `mydb`.`du_lieu_quan_ly`");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
+    #region function load dữ liệu
         public DataTable GetBanGhi(string nunberSelection) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
         {
             DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT *FROM `ban_ghi_phong_hoc`  ORDER BY Stt DESC LIMIT " + nunberSelection + "");
+            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT *FROM ban_ghi  ORDER BY STT DESC LIMIT " + nunberSelection + "");
             dataadapter.Fill(datareturn);
             return datareturn;
         }
+        public DataTable Getdanhsachthietbi(string nunberSelection) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
+        {
+            DataTable datareturn = new DataTable();
+            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT *FROM profile  ORDER BY ID_ZIGBEE DESC LIMIT " + nunberSelection + "");
+            dataadapter.Fill(datareturn);
+            return datareturn;
+        }
+        public DataTable Getdanhsachthietbi_ID(string ID_zigbee) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
+        {
+            DataTable datareturn = new DataTable();
+            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT *FROM profile where ID_ZIGBEE='" + ID_zigbee + "'");
+            dataadapter.Fill(datareturn);
+            return datareturn;
+        }
+        public DataTable Getthemthietbi(string nunberSelection) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
+        {
+            DataTable datareturn = new DataTable();
+            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT *FROM add_device  ORDER BY TIME DESC");
+            dataadapter.Fill(datareturn);
+            return datareturn;
+        }
+        #endregion
+        #region function xoa dữ liệu
+        public void delete_adddevice(string ID_device) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
+        {
+            ExecuteNonQuery("DELETE FROM add_device WHERE `ID_ZIGBEE`= '" + ID_device + "'");
+        }
+        public void delete_profile(string ID_device) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
+        {
+            ExecuteNonQuery("DELETE FROM profile WHERE `ID_ZIGBEE`= '" + ID_device + "'");
+        }
+        #endregion
+        #region function sua dữ liệu 
+        public void update_profile(string ID_device,string ADDR_zigbee, string Name, string Ngaysinh , string Diachi, string Sodienthoai) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
+        {
+            ExecuteNonQuery("UPDATE profile SET `ADDR_ZIGBEE`= '"+ ADDR_zigbee + "', `NAME`= '"+ Name + "', `NGAYSINH`= '"+ Ngaysinh + "', `DIACHI`= '"+ Diachi + "', `SDT`= '"+ Sodienthoai + "' WHERE `ID_ZIGBEE`= '"+ ID_device + "'");
+        }
+        #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public DataTable GetBanGhi_MaSo(string MaSo) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
         {
             DataTable datareturn = new DataTable();
@@ -182,20 +181,6 @@ namespace SP_Ketnoi
             dataadapter.Fill(datareturn);
             return datareturn;
         }
-        public DataTable GetHoSoMaQuanLy(string Maquanly) // lấy hồ sơ theo ma quan ly
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT * FROM mydb.du_lieu_quan_ly where `Ma_Quan_Ly` = '" + Maquanly + "'");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
-        public DataTable GetHoSoSinhVien() // lấy hồ sơ tất cả sinh viên
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT * FROM mydb.du_lieu_quan_ly where Ma_Lop_Chuc_Vu!='GIANGVIEN' AND Ma_Lop_Chuc_Vu!='NHANVIEN'");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
         public DataTable GetHoSo(string ChucVu) // lấy hồ sơ theo chức vụ , GIANGVIEN hoặc tên lớp 
         {
             DataTable datareturn = new DataTable();
@@ -203,33 +188,7 @@ namespace SP_Ketnoi
             dataadapter.Fill(datareturn);
             return datareturn;
         }
-        public DataTable GetChucVu() // lấy tất cả các tên Lớp học
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT distinct Ma_Lop_Chuc_Vu FROM mydb.du_lieu_quan_ly");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
-        public DataTable GetThongTinMonHoc(string GiangDuong) // lây thông tin môn học của giảng đường hiện tại
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
-
-        public void InSetTaiKhoan(string Maquanly, string Tennguoidung, string Matkhau, string Vaitro)  // thêm một tài khoản
-        {
-            ExecuteNonQuery("INSERT INTO `mydb`.`tai_khoan` (`Ma_Quan_Ly`, `Ten_Nguoi_Dung`, `Mat_Khau`, `Ma_Vai_Tro`) VALUES ('" + Maquanly + "', '" + Tennguoidung + "', '" + Matkhau + "', '" + Vaitro + "')");
-        }
-
-        public DataTable GetMonHoc() // lấy tất cả Môn hoc
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT * FROM mydb.mon_hoc;");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
+       
         public DataTable GetMonHocPhongHoc(string PhongHoc) // lấy tất cả Môn hoc theo phòng học
         {
             DataTable datareturn = new DataTable();
@@ -331,191 +290,5 @@ namespace SP_Ketnoi
         {
             ExecuteNonQuery("INSERT INTO `mydb`.`ban_ghi_phong_hoc` (`Ma_Quan_Ly`, `Ma_The`, `Ho_Ten`, `Ngay_Sinh`, `Ma_Lop_Chuc_vu`, `Ma_Lop_Hoc`,`Ma_Phong_Hoc`, `Ma_Giang_Duong`, `Thoi_Gian_Vao`, `Thoi_Gian_Ra`) VALUES ('" + MaQuanLy + "', '" + MaThe + "', '" + HoTen + "', '" + NgaySinh + "', '" + LopChucVu + "','" + MaMonHoc + "', '" + MaPhongHoc + "', '" + MaGiangDuong + "', '" + ThoiGian + "', '')");
         }
-
-        public string GetMonhoc_Now(string MaPhongHoc, DateTime thoigian_now)
-        {
-            string ThoiGianGio_Now = thoigian_now.ToString("HH:mm");
-
-            DataTable tableMonHoc = new DataTable();
-            DataTable tableMonHoc_Mamonhoc = new DataTable();
-            MySqlDataAdapter dataadapter;
-            dataadapter = GetDataAdapter("SELECT * FROM mydb.thoigian_hoc where Thoi_Gian_Bat_Bat_Dau_Diem_Danh < '" + ThoiGianGio_Now + "' and Thoi_Gian_Bat_Ket_Thuc_Diem_Danh >= '" + ThoiGianGio_Now + "' ");
-            dataadapter.Fill(tableMonHoc);
-            if (tableMonHoc.Rows.Count == 0)
-            {  // không có trong thời gian điểm danh
-
-                return "Khong Co";
-            }
-            else
-            {  // trong thoi gian điểm danh , truy vấn lấy thứ 
-                int dayofweek = (int)thoigian_now.DayOfWeek + 1; // lấy thứ  1: chủ nhật, 2: thứ 2 , 3 : thứ 3, 4: thứ 4 , 5: thứ 5 , 6: thứ 6, 7: thứ 7  
-                if (dayofweek == 1) // nếu chủ nhật 
-                {
-                    dayofweek = 8;
-                }
-                dataadapter = GetDataAdapter("SELECT * FROM `mydb`.`mon_hoc` where Ma_Phong_Hoc='" + MaPhongHoc + "' and Thu_Trong_Tuan ='" + dayofweek.ToString() + "' and Thoi_Gian_Bat_Dau='" + tableMonHoc.Rows[0][0].ToString() + "' ");//
-                dataadapter.Fill(tableMonHoc_Mamonhoc);
-                if (tableMonHoc_Mamonhoc.Rows.Count == 0)
-                {
-                    return "Khong Co";
-                }
-                else
-                {
-                    return tableMonHoc_Mamonhoc.Rows[0]["Ma_Lop_Mon_Hoc"].ToString();
-                }
-
-            }
-        }
-
-
-        public bool SetDiemDanhSinhVien(string MaQuanLy, string MonHoc, DateTime ThoiGian)
-        {   // truy nhập xem có tên sinh viên không , xem cột cuối cùng có trùng ngày , có thì update điểm danh , không thì thêm cột và update 
-            string ngaythang = ThoiGian.ToString("yyyy-MM-dd");
-            DataTable tablediemdanh = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT * FROM `mydb`.`" + MonHoc + "`where `Ma_Quan_Ly`='" + MaQuanLy + "'");
-            dataadapter.Fill(tablediemdanh);
-            if (tablediemdanh.Rows.Count == 0)
-            {
-                return false;
-            }
-            else
-            {
-
-                //Int32 songayvang= Int32.Parse(tablediemdanh.Rows[0]["So_Ngay_Vang"].ToString())+1;
-                DataTable tablediemdanh_check = new DataTable();
-                dataadapter = GetDataAdapter("SHOW columns FROM `mydb`.`" + MonHoc + "`");
-                dataadapter.Fill(tablediemdanh_check);
-                if (tablediemdanh_check.Rows[tablediemdanh_check.Rows.Count - 1][0].ToString() != ngaythang)
-                {
-
-                    // thêm cột ngày tháng
-                    DataTable diemdanh = new DataTable();
-                    ExecuteNonQuery("ALTER TABLE `mydb`.`" + MonHoc + "` ADD COLUMN `" + ngaythang + "` INT NULL");
-                    diemdanh = GetDiemDanhMonHoc(MonHoc);
-
-                    for (int n = 0; n < diemdanh.Rows.Count; n++)
-                    {
-                        ExecuteNonQuery("UPDATE `mydb`.`" + MonHoc + "` SET `So_Ngay_Vang`='" + ((int)diemdanh.Rows[n][5] + 1).ToString() + "', `" + ngaythang + "`='0' WHERE `Ma_Quan_Ly`='" + diemdanh.Rows[n][1].ToString() + "';");
-                    }
-                    dataadapter = GetDataAdapter("SELECT * FROM `mydb`.`" + MonHoc + "`where `Ma_Quan_Ly`='" + MaQuanLy + "'");
-                    tablediemdanh.Clear();
-                    dataadapter.Fill(tablediemdanh);
-                    ExecuteNonQuery("UPDATE `mydb`.`" + MonHoc + "` SET `So_Ngay_Vang`='" + ((int)tablediemdanh.Rows[0][5] - 1).ToString() + "', `" + ngaythang + "`='1' WHERE `Ma_Quan_Ly`='" + MaQuanLy + "'");//UPDATE `mydb`.`" + MonHoc + "` SET `" + ngaythang + "`='1' WHERE `Ma_Quan_Ly`='" + MaQuanLy + "'");
-                    return true;
-                }
-                else
-                {
-                    dataadapter = GetDataAdapter("SELECT * FROM `mydb`.`" + MonHoc + "`where `Ma_Quan_Ly`='" + MaQuanLy + "'");
-                    dataadapter.Fill(tablediemdanh);
-                    if (tablediemdanh.Rows[0][tablediemdanh.Columns.Count - 1].ToString() != "1")
-                    {
-                        ExecuteNonQuery("UPDATE `mydb`.`" + MonHoc + "` SET `So_Ngay_Vang`='" + ((int)tablediemdanh.Rows[0][5] - 1).ToString() + "', `" + ngaythang + "`='1' WHERE `Ma_Quan_Ly`='" + MaQuanLy + "'");
-                    }
-                    return true;
-                }
-
-            }
-
-        }
-        public DataTable GetTimKiemSinhVien(string TimKiem, string Lever)
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter;
-            if (Lever == "Ten")
-            {
-                dataadapter = GetDataAdapter("SELECT * FROM mydb.du_lieu_quan_ly where `Ho_Va_Ten` like '%" + TimKiem + "%' ;");
-                dataadapter.Fill(datareturn);
-            }
-            else if (Lever == "MaSo")
-            {
-                dataadapter = GetDataAdapter("SELECT * FROM mydb.du_lieu_quan_ly where `Ma_Quan_Ly` like '%" + TimKiem + "%';");
-                dataadapter.Fill(datareturn);
-            }
-            return datareturn;
-        }
-
-        public DataTable GetHoSo_MaQL_MaThe(string MaQuanLy, string MaThe) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT * FROM `mydb`.`du_lieu_quan_ly` where `Ma_Quan_Ly`= '" + MaQuanLy + "' and `Ma_The`= '" + MaThe + "'");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
-        public DataTable GetHoSo_MaThe(string MaThe) // lấy ra nunberSelection bản ghi sắp xếp theo giảm dần không phân loại phòng
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT * FROM `mydb`.`du_lieu_quan_ly` where `Ma_The`= '" + MaThe + "'");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
-        public void DelTableMonHoc(string MonHoc)
-        {
-            ExecuteNonQuery("DROP TABLE `mydb`.`" + MonHoc + "`");
-        }
-        public void CreatetableMonHoc(string MonHoc)
-        {
-            //
-        }
-
-        public DataTable GetTimKiemSinhVien_MonHoc(string MonHoc, string TimKiem, string Lever)
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter;
-            if (Lever == "Ten")
-            {
-                dataadapter = GetDataAdapter("SELECT * FROM `mydb`.`" + MonHoc + "` where `Ho_Va_Ten` like '%" + TimKiem + "%';");
-                dataadapter.Fill(datareturn);
-            }
-            else if (Lever == "MaSo")
-            {
-                dataadapter = GetDataAdapter("SELECT * FROM `mydb`.`" + MonHoc + "` where `Ma_Quan_Ly` like '%" + TimKiem + "%';");
-                dataadapter.Fill(datareturn);
-            }
-            return datareturn;
-        }
-
-        public DataTable GetMonHoc_MaLopMonHoc(string MaLopMonHoc)
-        {
-            DataTable datareturn = new DataTable();
-            MySqlDataAdapter dataadapter = GetDataAdapter("SELECT * FROM mydb.mon_hoc where Ma_Lop_Mon_Hoc = '" + MaLopMonHoc + "'");
-            dataadapter.Fill(datareturn);
-            return datareturn;
-        }
-
-        public void InsertMonHoc(string Ma_Lop_Mon_Hoc, string Ma_Mon_Hoc, string Ten_Mon_Hoc, string Giang_Vien_Day, string Ma_Phong_Hoc, string So_Luong_Sinh_Vien, string Thu_Trong_Tuan, string Thoi_Gian_Bat_Dau, string Thoi_Gian_Ket_Thuc, string So_Tin_Chi)
-        {
-            ExecuteNonQuery("INSERT INTO `mydb`.`mon_hoc` (`Ma_Lop_Mon_Hoc`, `Ma_Mon_Hoc`, `Ten_Mon_Hoc`, `Giang_Vien_Day`, `Ma_Phong_Hoc`, `So_Luong_Sinh_Vien`, `Thu_Trong_Tuan`, `Thoi_Gian_Bat_Dau`, `Thoi_Gian_Ket_Thuc`, `So_Tin_Chi`) VALUES ('" + Ma_Lop_Mon_Hoc + "', '" + Ma_Mon_Hoc + "', '" + Ten_Mon_Hoc + "', '" + Giang_Vien_Day + "', '" + Ma_Phong_Hoc + "', '" + So_Luong_Sinh_Vien + "', '" + Thu_Trong_Tuan + "', '" + Thoi_Gian_Bat_Dau + "', '" + Thoi_Gian_Ket_Thuc + "', '" + So_Tin_Chi + "')");
-        }
-        public void UpdateMonHoc(string MaLopMonHoc, string Ma_Lop_Mon_Hoc_New, string Ma_Mon_Hoc, string Ten_Mon_Hoc, string Giang_Vien_Day, string Ma_Phong_Hoc, string So_Luong_Sinh_Vien, string Thu_Trong_Tuan, string Thoi_Gian_Bat_Dau, string Thoi_Gian_Ket_Thuc, string So_Tin_Chi)
-        {
-            ExecuteNonQuery("UPDATE `mydb`.`mon_hoc` SET `Ma_Lop_Mon_Hoc`='" + Ma_Lop_Mon_Hoc_New + "', `Ma_Mon_Hoc`='" + Ma_Mon_Hoc + "', `Ten_Mon_Hoc`='" + Ten_Mon_Hoc + "', `Giang_Vien_Day`='" + Giang_Vien_Day + "', `Ma_Phong_Hoc`='" + Ma_Phong_Hoc + "', `So_Luong_Sinh_Vien`='" + So_Luong_Sinh_Vien + "', `Thu_Trong_Tuan`='" + Thu_Trong_Tuan + "', `Thoi_Gian_Bat_Dau`='" + Thoi_Gian_Bat_Dau + "', `Thoi_Gian_Ket_Thuc`='" + Thoi_Gian_Ket_Thuc + "', `So_Tin_Chi`='" + So_Tin_Chi + "' WHERE `Ma_Lop_Mon_Hoc`='" + MaLopMonHoc + "'");
-        }
-
-
-
-        public void DelMonHoc(string MaLopMonHoc)
-        {
-            ExecuteNonQuery("DELETE FROM `mydb`.`mon_hoc` WHERE `Ma_Lop_Mon_Hoc`='" + MaLopMonHoc + "'");
-        }
-        public void TaobangMonHoc(string MaLopMonHoc)
-        {
-            ExecuteNonQuery("DROP TABLE IF EXISTS `" + MaLopMonHoc + "`");
-            ExecuteNonQuery("CREATE TABLE IF NOT EXISTS `mydb`.`" + MaLopMonHoc + "` ( `Stt` int NOT NULL, `Ma_Quan_Ly` VARCHAR(8) NOT NULL, `Ho_Va_Ten` VARCHAR(45) NULL, `Ngay_Sinh` DATE NULL, `Ghi_Chu` VARCHAR(45) NULL, `So_Ngay_Vang` INT NULL, PRIMARY KEY (`Ma_Quan_Ly`)) ENGINE = InnoDB;");
-        }
-
-
-        public void DoiTenBangMonHoc(string MaLopMonHoc, string MaLopMonHoc_New)
-        {
-            ExecuteNonQuery("ALTER TABLE `mydb`.`" + MaLopMonHoc + "` RENAME TO  `mydb`.`" + MaLopMonHoc_New + "` ;");
-        }
-
-        public void XoaBangMonHoc(string MaLopMonHoc)
-        {
-            ExecuteNonQuery("DROP TABLE IF EXISTS `" + MaLopMonHoc + "`");
-        }
-
-        //Tiến Viết Thêm
-
-
     }
 }
